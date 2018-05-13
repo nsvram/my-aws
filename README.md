@@ -112,3 +112,20 @@ def get_dist_cp_step(bucket_name, source_path, target_path):
     }]
 #get_dist_cp_step("1.venkat", "emr/input/", "emr/output/")
 get_dist_cp_step("1.venkat", "emr/input/all_station_master.csv", "emr/output/all_station_master.csv")
+
+
+
+
+# Sample python file
+from __future__ import print_function
+from pyspark import SparkContext
+import sys
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: testjob  ", file=sys.stderr)
+        exit(-1)
+    sc = SparkContext(appName="MyTestJob")
+    dataTextAll = sc.textFile("s3a://1.venkat/emr/input/all_station_master.csv")
+    dataRDD = dataTextAll.map(lambda x: x.split(",")).map(lambda y: (str(y[0]), float(y[1]))).reduceByKey(lambda a, b: a + b)
+    dataRDD.saveAsTextFile("s3a://1.venkat/emr/output/spark-test.csv")
+    sc.stop()
